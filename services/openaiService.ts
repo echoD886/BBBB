@@ -104,19 +104,27 @@ export const generateRecipe = async (ingredients: string, filters: SearchFilters
     } catch (error) {
         console.error("Error in generateRecipe service:", error);
 
-        if (error instanceof APIError) {
-            if (error.status === 429) {
-                throw new Error("API_QUOTA_EXCEEDED");
-            }
-            if (error.status === 401 || error.status === 403) {
-                throw new Error("API_INVALID_KEY");
-            }
+        const status = error instanceof APIError
+            ? error.status
+            : (typeof error === 'object' && error !== null && 'status' in error ? Number((error as { status?: number }).status) : undefined);
+
+        if (status === 429) {
+            throw new Error("API_QUOTA_EXCEEDED");
+        }
+
+        if (status === 401 || status === 403) {
+            throw new Error("API_INVALID_KEY");
         }
 
         if (error instanceof Error) {
             if (error.message.includes("JSON")) {
                 throw new Error("error.invalidRecipeFormat");
             }
+
+            if (error.message.includes("you exceeded your current quota") || error.message.includes("rate limit")) {
+                throw new Error("API_QUOTA_EXCEEDED");
+            }
+
             throw error;
         }
 
