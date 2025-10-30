@@ -2,7 +2,8 @@ import React, { useState, useCallback } from 'react';
 import { Header } from './components/Header';
 import { RecipeCard } from './components/RecipeCard';
 import { GeneratedRecipeModal } from './components/GeneratedRecipeModal';
-import { generateRecipe } from './services/openaiService';
+import { generateRecipe as generateRecipeWithOpenAI } from './services/openaiService';
+import { generateRecipe as generateRecipeWithGemini } from './services/geminiService';
 import type { Recipe, SearchFilters } from './types';
 import { PREFERENCE_OPTIONS, DIFFICULTY_OPTIONS, DIET_OPTIONS } from './constants';
 import { useTranslation } from './i18n';
@@ -26,6 +27,7 @@ const App: React.FC = () => {
     API_QUOTA_EXCEEDED: 'error.quotaExceeded',
     API_INVALID_KEY: 'error.invalidKey',
     API_UNKNOWN_ERROR: 'error.unknown',
+    GEMINI_API_KEY_MISSING: 'error.geminiKeyMissing',
     'error.invalidRecipeFormat': 'error.invalidRecipeFormat',
   };
 
@@ -38,10 +40,36 @@ const App: React.FC = () => {
     setError(null);
     setGeneratedRecipe(null);
     try {
-      const recipe = await generateRecipe(ingredients, filters, language);
+      const recipe = await generateRecipeWithOpenAI(ingredients, filters, language);
       setGeneratedRecipe(recipe);
     } catch (err) {
       console.error(err);
+      const geminiAvailable = Boolean(import.meta.env.VITE_GEMINI_API_KEY);
+
+      if (err instanceof Error && err.message === 'API_QUOTA_EXCEEDED') {
+        if (!geminiAvailable) {
+          setError(t('error.quotaExceededNoFallback'));
+          return;
+        }
+
+        try {
+          const fallbackRecipe = await generateRecipeWithGemini(ingredients, filters, language);
+          setGeneratedRecipe(fallbackRecipe);
+          return;
+        } catch (fallbackError) {
+          console.error(fallbackError);
+          if (fallbackError instanceof Error) {
+            const translationKey = ERROR_MESSAGE_MAP[fallbackError.message];
+            if (translationKey) {
+              setError(t(translationKey));
+              return;
+            }
+          }
+          setError(t('error.quotaExceededFallbackFailed'));
+          return;
+        }
+      }
+
       if (err instanceof Error) {
         const translationKey = ERROR_MESSAGE_MAP[err.message];
         if (translationKey) {

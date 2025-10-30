@@ -81,6 +81,9 @@ const translations = {
         invalidRecipeFormat: 'The AI response was incomplete. Please try again.',
         quotaExceeded: 'OpenAI quota is exceeded. Check billing or try later.',
         invalidKey: 'OpenAI API key is invalid or missing. Update the key.',
+        quotaExceededNoFallback: 'OpenAI quota exceeded and no fallback model is configured.',
+        quotaExceededFallbackFailed: 'OpenAI quota exceeded and the fallback also failed. Please try again later.',
+        geminiKeyMissing: 'Gemini API key is missing. Set VITE_GEMINI_API_KEY to enable fallback.',
         unknown: 'An unknown error occurred. Please try again later.'
     }
   },
@@ -166,6 +169,9 @@ const translations = {
         invalidRecipeFormat: 'AI 返回的数据不完整，请重试。',
         quotaExceeded: 'OpenAI 配额已用完，请检查账单或稍后再试。',
         invalidKey: 'OpenAI API Key 无效或缺失，请更新密钥。',
+        quotaExceededNoFallback: 'OpenAI 配额已用完，且未配置备用模型。',
+        quotaExceededFallbackFailed: 'OpenAI 配额已用完，备用模型也未生成成功，请稍后再试。',
+        geminiKeyMissing: '缺少 Gemini API Key，请设置 VITE_GEMINI_API_KEY 以启用备用方案。',
         unknown: '发生未知错误，请稍后再试。'
     }
   },

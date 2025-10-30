@@ -11,7 +11,7 @@ if (API_KEY) {
 
 const getAI = () => {
     if (!ai) {
-        throw new Error("VITE_GEMINI_API_KEY environment variable not set. Please configure your API key in .env.local");
+        throw new Error("GEMINI_API_KEY_MISSING");
     }
     return ai;
 };
@@ -109,10 +109,10 @@ export const generateRecipe = async (ingredients: string, filters: SearchFilters
         console.error("Error in generateRecipe service:", error);
         if (error instanceof Error) {
             if (error.message.includes("JSON")) {
-                 throw new Error("The AI returned an invalid recipe format. Please try generating again.");
+                 throw new Error("error.invalidRecipeFormat");
             }
             throw error;
         }
-        throw new Error("An unknown error occurred during recipe generation.");
+        throw new Error("API_UNKNOWN_ERROR");
     }
 };
