@@ -2,11 +2,19 @@ import { GoogleGenAI, Type } from "@google/genai";
 import type { Recipe, SearchFilters } from '../types';
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
-if (!API_KEY) {
-    throw new Error("VITE_GEMINI_API_KEY environment variable not set");
+
+let ai: GoogleGenAI | null = null;
+
+if (API_KEY) {
+    ai = new GoogleGenAI({ apiKey: API_KEY });
 }
 
-const ai = new GoogleGenAI({ apiKey: API_KEY });
+const getAI = () => {
+    if (!ai) {
+        throw new Error("VITE_GEMINI_API_KEY environment variable not set. Please configure your API key in .env.local");
+    }
+    return ai;
+};
 
 export const generateRecipe = async (ingredients: string, filters: SearchFilters, language: 'en' | 'zh'): Promise<Recipe> => {
     const recipePrompt = `
@@ -22,8 +30,9 @@ export const generateRecipe = async (ingredients: string, filters: SearchFilters
     `;
 
     try {
+        const aiInstance = getAI();
         // Step 1: Generate Recipe JSON using a text model with a response schema
-        const recipeResponse = await ai.models.generateContent({
+        const recipeResponse = await aiInstance.models.generateContent({
             model: 'gemini-2.5-flash',
             contents: recipePrompt,
             config: {
@@ -73,7 +82,7 @@ export const generateRecipe = async (ingredients: string, filters: SearchFilters
         // Step 2: Generate Recipe Image using an image model
         const imagePrompt = `A beautiful, realistic, appetizing photo of "${recipe.recipeName}". A professionally shot food photograph, perfectly lit, high resolution.`;
         
-        const imageResponse = await ai.models.generateImages({
+        const imageResponse = await aiInstance.models.generateImages({
             model: 'imagen-4.0-generate-001',
             prompt: imagePrompt,
             config: {
