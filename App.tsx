@@ -40,36 +40,11 @@ const App: React.FC = () => {
     setError(null);
     setGeneratedRecipe(null);
     try {
-      const recipe = await generateRecipeWithOpenAI(ingredients, filters, language);
+      // 直接使用 Gemini API
+      const recipe = await generateRecipeWithGemini(ingredients, filters, language);
       setGeneratedRecipe(recipe);
     } catch (err) {
       console.error(err);
-      const geminiAvailable = Boolean(import.meta.env.VITE_GEMINI_API_KEY);
-
-      if (err instanceof Error && err.message === 'API_QUOTA_EXCEEDED') {
-        if (!geminiAvailable) {
-          setError(t('error.quotaExceededNoFallback'));
-          return;
-        }
-
-        try {
-          const fallbackRecipe = await generateRecipeWithGemini(ingredients, filters, language);
-          setGeneratedRecipe(fallbackRecipe);
-          return;
-        } catch (fallbackError) {
-          console.error(fallbackError);
-          if (fallbackError instanceof Error) {
-            const translationKey = ERROR_MESSAGE_MAP[fallbackError.message];
-            if (translationKey) {
-              setError(t(translationKey));
-              return;
-            }
-          }
-          setError(t('error.quotaExceededFallbackFailed'));
-          return;
-        }
-      }
-
       if (err instanceof Error) {
         const translationKey = ERROR_MESSAGE_MAP[err.message];
         if (translationKey) {
@@ -88,6 +63,74 @@ const App: React.FC = () => {
   const closeModal = () => {
     setGeneratedRecipe(null);
     setError(null);
+  }
+
+  // 示例食谱数据
+  const sampleRecipes: Record<string, Recipe> = {
+    chicken: {
+      recipeName: language === 'zh' ? '香煎鸡胸肉配时蔬' : 'Pan-Seared Chicken Breast with Vegetables',
+      description: language === 'zh' ? '简单快速的健康低脂料理，完美的工作日晚餐选择' : 'A simple, quick, and healthy low-fat dish, perfect for a weekday dinner',
+      prepTime: language === 'zh' ? '10分钟' : '10 minutes',
+      cookTime: language === 'zh' ? '20分钟' : '20 minutes',
+      servings: language === 'zh' ? '2人份' : '2 servings',
+      ingredients: language === 'zh'
+        ? ['鸡胸肉 300克', '西兰花 200克', '胡萝卜 1根', '橄榄油 2汤匙', '蒜末 2瓣', '盐 适量', '黑胡椒 适量', '柠檬汁 1汤匙']
+        : ['Chicken breast 300g', 'Broccoli 200g', 'Carrot 1 piece', 'Olive oil 2 tbsp', 'Minced garlic 2 cloves', 'Salt to taste', 'Black pepper to taste', 'Lemon juice 1 tbsp'],
+      steps: language === 'zh'
+        ? ['将鸡胸肉用盐和黑胡椒腌制15分钟', '西兰花切小朵，胡萝卜切片', '热锅加橄榄油，煎鸡胸肉每面4-5分钟至金黄', '取出鸡肉，同锅加蒜末炒香', '加入蔬菜翻炒5分钟', '鸡肉切片摆盘，配上蔬菜', '淋上柠檬汁即可享用']
+        : ['Marinate chicken breast with salt and pepper for 15 minutes', 'Cut broccoli into florets, slice carrots', 'Heat pan with olive oil, sear chicken 4-5 minutes each side until golden', 'Remove chicken, sauté garlic in same pan', 'Add vegetables and stir-fry for 5 minutes', 'Slice chicken and plate with vegetables', 'Drizzle with lemon juice and serve'],
+      tags: language === 'zh' ? ['快手', '健康', '低脂'] : ['Quick', 'Healthy', 'Low-fat'],
+      imageUrl: 'https://images.pexels.com/photos/2338407/pexels-photo-2338407.jpeg?auto=compress&cs=tinysrgb&w=800'
+    },
+    pasta: {
+      recipeName: language === 'zh' ? '经典意式番茄罗勒意面' : 'Classic Italian Tomato Basil Pasta',
+      description: language === 'zh' ? '传统意式风味，简单食材造就经典美味' : 'Traditional Italian flavor with simple ingredients',
+      prepTime: language === 'zh' ? '5分钟' : '5 minutes',
+      cookTime: language === 'zh' ? '15分钟' : '15 minutes',
+      servings: language === 'zh' ? '2人份' : '2 servings',
+      ingredients: language === 'zh'
+        ? ['意大利面 200克', '番茄 4个', '新鲜罗勒 1把', '大蒜 3瓣', '橄榄油 3汤匙', '帕玛森芝士 适量', '盐 适量', '黑胡椒 适量']
+        : ['Pasta 200g', 'Tomatoes 4 pieces', 'Fresh basil 1 bunch', 'Garlic 3 cloves', 'Olive oil 3 tbsp', 'Parmesan cheese to taste', 'Salt to taste', 'Black pepper to taste'],
+      steps: language === 'zh'
+        ? ['煮一锅盐水，煮意大利面至弹牙状态', '番茄切丁，大蒜切片，罗勒撕碎', '热锅加橄榄油，爆香蒜片', '加入番茄丁，中火煮10分钟', '加入煮好的意面翻炒均匀', '加入罗勒叶，调味', '装盘撒上帕玛森芝士']
+        : ['Boil salted water and cook pasta al dente', 'Dice tomatoes, slice garlic, tear basil', 'Heat olive oil and sauté garlic', 'Add tomatoes and simmer for 10 minutes', 'Toss in cooked pasta', 'Add basil and season', 'Plate and top with Parmesan'],
+      tags: language === 'zh' ? ['素食', '经典', '意式'] : ['Vegetarian', 'Classic', 'Italian'],
+      imageUrl: 'https://images.pexels.com/photos/1437267/pexels-photo-1437267.jpeg?auto=compress&cs=tinysrgb&w=800'
+    },
+    salmon: {
+      recipeName: language === 'zh' ? '香煎三文鱼配柠檬黄油' : 'Pan-Seared Salmon with Lemon Butter',
+      description: language === 'zh' ? '富含Omega-3，美味又健康的海鲜佳肴' : 'Rich in Omega-3, delicious and healthy seafood dish',
+      prepTime: language === 'zh' ? '5分钟' : '5 minutes',
+      cookTime: language === 'zh' ? '12分钟' : '12 minutes',
+      servings: language === 'zh' ? '2人份' : '2 servings',
+      ingredients: language === 'zh'
+        ? ['三文鱼 2块', '黄油 30克', '柠檬 1个', '新鲜莳萝 少许', '盐 适量', '黑胡椒 适量', '橄榄油 1汤匙']
+        : ['Salmon fillets 2 pieces', 'Butter 30g', 'Lemon 1 piece', 'Fresh dill a pinch', 'Salt to taste', 'Black pepper to taste', 'Olive oil 1 tbsp'],
+      steps: language === 'zh'
+        ? ['三文鱼用盐和胡椒调味', '热锅加橄榄油，鱼皮面朝下煎4分钟', '翻面再煎3分钟', '取出三文鱼', '同锅加黄油融化，挤入柠檬汁', '加入莳萝，搅拌成酱汁', '将酱汁淋在三文鱼上即可']
+        : ['Season salmon with salt and pepper', 'Heat oil, sear skin-side down for 4 minutes', 'Flip and cook for 3 more minutes', 'Remove salmon', 'Melt butter in pan, add lemon juice', 'Add dill and stir into sauce', 'Pour sauce over salmon'],
+      tags: language === 'zh' ? ['低卡', '海鲜', '高蛋白'] : ['Low-cal', 'Seafood', 'High-protein'],
+      imageUrl: 'https://images.pexels.com/photos/262959/pexels-photo-262959.jpeg?auto=compress&cs=tinysrgb&w=800'
+    },
+    soup: {
+      recipeName: language === 'zh' ? '法式洋葱汤' : 'French Onion Soup',
+      description: language === 'zh' ? '浓郁温暖的经典法式汤品，完美的冬日暖身选择' : 'Rich and warming classic French soup, perfect for winter',
+      prepTime: language === 'zh' ? '15分钟' : '15 minutes',
+      cookTime: language === 'zh' ? '45分钟' : '45 minutes',
+      servings: language === 'zh' ? '4人份' : '4 servings',
+      ingredients: language === 'zh'
+        ? ['洋葱 6个', '黄油 50克', '牛肉高汤 1升', '白葡萄酒 100毫升', '法式面包 4片', '格鲁耶尔奶酪 200克', '百里香 2支', '盐 适量', '黑胡椒 适量']
+        : ['Onions 6 pieces', 'Butter 50g', 'Beef broth 1L', 'White wine 100ml', 'French bread 4 slices', 'Gruyère cheese 200g', 'Thyme 2 sprigs', 'Salt to taste', 'Black pepper to taste'],
+      steps: language === 'zh'
+        ? ['洋葱切丝', '大锅融化黄油，加入洋葱', '小火慢炒30分钟至焦糖化', '倒入白葡萄酒，煮至挥发', '加入高汤和百里香，煮15分钟', '面包片烤至金黄，铺上奶酪', '汤盛入碗中，放上芝士面包', '放入烤箱烤至奶酪融化金黄']
+        : ['Slice onions thinly', 'Melt butter in large pot, add onions', 'Cook low heat for 30 mins until caramelized', 'Add wine and cook until evaporated', 'Add broth and thyme, simmer 15 minutes', 'Toast bread, top with cheese', 'Pour soup into bowls, add cheese toast', 'Broil until cheese melts and browns'],
+      tags: language === 'zh' ? ['舒适', '西式', '经典'] : ['Comfort', 'Western', 'Classic'],
+      imageUrl: 'https://images.pexels.com/photos/539451/pexels-photo-539451.jpeg?auto=compress&cs=tinysrgb&w=800'
+    }
+  };
+
+  const handleSampleRecipeClick = (recipeKey: string) => {
+    setGeneratedRecipe(sampleRecipes[recipeKey]);
   }
 
   const FilterGroup: React.FC<{ title: string; options: readonly string[]; type: keyof SearchFilters }> = ({ title, options, type }) => (
@@ -162,10 +205,30 @@ const App: React.FC = () => {
           <div className="container mx-auto px-4">
             <h2 className="text-3xl font-bold text-center mb-10">{t('picks.title')}</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-              <RecipeCard image="https://images.pexels.com/photos/2338407/pexels-photo-2338407.jpeg?auto=compress&cs=tinysrgb&w=800" name={t('picks.recipes.chicken')} tags={[t('tags.quick'), t('tags.healthy')]} />
-              <RecipeCard image="https://images.pexels.com/photos/1437267/pexels-photo-1437267.jpeg?auto=compress&cs=tinysrgb&w=800" name={t('picks.recipes.pasta')} tags={[t('tags.vegetarian'), t('tags.classic')]} />
-              <RecipeCard image="https://images.pexels.com/photos/262959/pexels-photo-262959.jpeg?auto=compress&cs=tinysrgb&w=800" name={t('picks.recipes.salmon')} tags={[t('tags.lowCal'), t('tags.seafood')]} />
-              <RecipeCard image="https://images.pexels.com/photos/539451/pexels-photo-539451.jpeg?auto=compress&cs=tinysrgb&w=800" name={t('picks.recipes.soup')} tags={[t('tags.comfort'), t('tags.western')]} />
+              <RecipeCard
+                image="https://images.pexels.com/photos/2338407/pexels-photo-2338407.jpeg?auto=compress&cs=tinysrgb&w=800"
+                name={t('picks.recipes.chicken')}
+                tags={[t('tags.quick'), t('tags.healthy')]}
+                onClick={() => handleSampleRecipeClick('chicken')}
+              />
+              <RecipeCard
+                image="https://images.pexels.com/photos/1437267/pexels-photo-1437267.jpeg?auto=compress&cs=tinysrgb&w=800"
+                name={t('picks.recipes.pasta')}
+                tags={[t('tags.vegetarian'), t('tags.classic')]}
+                onClick={() => handleSampleRecipeClick('pasta')}
+              />
+              <RecipeCard
+                image="https://images.pexels.com/photos/262959/pexels-photo-262959.jpeg?auto=compress&cs=tinysrgb&w=800"
+                name={t('picks.recipes.salmon')}
+                tags={[t('tags.lowCal'), t('tags.seafood')]}
+                onClick={() => handleSampleRecipeClick('salmon')}
+              />
+              <RecipeCard
+                image="https://images.pexels.com/photos/539451/pexels-photo-539451.jpeg?auto=compress&cs=tinysrgb&w=800"
+                name={t('picks.recipes.soup')}
+                tags={[t('tags.comfort'), t('tags.western')]}
+                onClick={() => handleSampleRecipeClick('soup')}
+              />
             </div>
           </div>
         </section>
