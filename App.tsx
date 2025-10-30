@@ -133,6 +133,49 @@ const App: React.FC = () => {
     setGeneratedRecipe(sampleRecipes[recipeKey]);
   }
 
+  // 随机食材数据库
+  const randomIngredientsPool = language === 'zh'
+    ? [
+        ['鸡蛋', '番茄', '葱'],
+        ['土豆', '牛肉', '洋葱'],
+        ['三文鱼', '柠檬', '黄油'],
+        ['意大利面', '罗勒', '大蒜'],
+        ['鸡胸肉', '西兰花', '胡萝卜'],
+        ['虾仁', '蒜蓉', '粉丝'],
+        ['豆腐', '香菇', '青菜'],
+        ['猪肉', '大白菜', '生姜'],
+        ['茄子', '青椒', '蒜'],
+        ['米饭', '鸡蛋', '酱油']
+      ]
+    : [
+        ['eggs', 'tomatoes', 'scallions'],
+        ['potatoes', 'beef', 'onions'],
+        ['salmon', 'lemon', 'butter'],
+        ['pasta', 'basil', 'garlic'],
+        ['chicken breast', 'broccoli', 'carrots'],
+        ['shrimp', 'garlic', 'vermicelli'],
+        ['tofu', 'mushrooms', 'bok choy'],
+        ['pork', 'cabbage', 'ginger'],
+        ['eggplant', 'bell peppers', 'garlic'],
+        ['rice', 'eggs', 'soy sauce']
+      ];
+
+  // 随机生成食材并触发生成
+  const handleRandomGenerate = () => {
+    // 随机选择一组食材
+    const randomIndex = Math.floor(Math.random() * randomIngredientsPool.length);
+    const randomIngredients = randomIngredientsPool[randomIndex].join(', ');
+
+    // 设置食材
+    setIngredients(randomIngredients);
+
+    // 延迟一下，让用户看到食材已填充
+    setTimeout(() => {
+      // 自动触发生成
+      handleGenerateClick();
+    }, 300);
+  }
+
   const FilterGroup: React.FC<{ title: string; options: readonly string[]; type: keyof SearchFilters }> = ({ title, options, type }) => (
     <div className="flex flex-wrap items-center gap-2 md:gap-3">
       <span className="text-white font-medium text-sm">{title}:</span>
@@ -174,7 +217,21 @@ const App: React.FC = () => {
                   placeholder={t('hero.placeholder')}
                   className="w-full p-4 pr-12 text-lg text-slate-900 rounded-lg border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-orange-400"
                 />
-                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="absolute right-4 top-1/2 -translate-y-1/2 h-6 w-6 text-slate-400"><path d="M11 2a2 2 0 0 0-2 2v5H4a2 2 0 0 0-2 2v2a2 2 0 0 0 2 2h5v5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2v-5h5a2 2 0 0 0 2-2v-2a2 2 0 0 0-2-2h-5V4a2 2 0 0 0-2-2h-2z"></path></svg>
+                <button
+                  onClick={handleRandomGenerate}
+                  disabled={isLoading}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 h-8 w-8 flex items-center justify-center rounded-full hover:bg-orange-100 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed group"
+                  title={language === 'zh' ? '随机生成食谱' : 'Generate random recipe'}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-6 w-6 text-orange-500 group-hover:text-orange-600 group-hover:rotate-12 transition-all duration-200">
+                    <rect width="12" height="12" x="2" y="10" rx="2" ry="2"></rect>
+                    <path d="m17.92 14 3.5-3.5a2.24 2.24 0 0 0 0-3l-5-4.92a2.24 2.24 0 0 0-3 0L10 6"></path>
+                    <path d="M6 18h.01"></path>
+                    <path d="M10 14h.01"></path>
+                    <path d="M15 6h.01"></path>
+                    <path d="M18 9h.01"></path>
+                  </svg>
+                </button>
               </div>
               <div className="mt-4 flex flex-col md:flex-row gap-4 justify-center">
                   <FilterGroup title={t('filters.preference.title')} options={PREFERENCE_OPTIONS} type="preference" />
