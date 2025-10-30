@@ -6,7 +6,10 @@ const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 let openai: OpenAI | null = null;
 
 if (API_KEY) {
-    openai = new OpenAI({ apiKey: API_KEY });
+    openai = new OpenAI({ 
+        apiKey: API_KEY,
+        dangerouslyAllowBrowser: true 
+    });
 }
 
 const getOpenAI = () => {
