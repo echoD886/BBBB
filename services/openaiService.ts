@@ -5,16 +5,24 @@ const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
 
 let openai: OpenAI | null = null;
 
-if (API_KEY) {
-    openai = new OpenAI({ 
+// Validate API key - check if it exists and is not a placeholder
+const isValidApiKey = (key: string | undefined): boolean => {
+    if (!key || key.trim() === '') return false;
+    // Check for common placeholder values
+    const placeholders = ['your_api_key_here', 'your-api-key', 'placeholder', 'xxx'];
+    return !placeholders.some(placeholder => key.toLowerCase().includes(placeholder.toLowerCase()));
+};
+
+if (isValidApiKey(API_KEY)) {
+    openai = new OpenAI({
         apiKey: API_KEY,
-        dangerouslyAllowBrowser: true 
+        dangerouslyAllowBrowser: true
     });
 }
 
 const getOpenAI = () => {
     if (!openai) {
-        throw new Error("VITE_OPENAI_API_KEY environment variable not set. Please configure your API key in .env.local");
+        throw new Error("API_INVALID_KEY");
     }
     return openai;
 };
