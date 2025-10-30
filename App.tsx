@@ -2,7 +2,7 @@ import React, { useState, useCallback } from 'react';
 import { Header } from './components/Header';
 import { RecipeCard } from './components/RecipeCard';
 import { GeneratedRecipeModal } from './components/GeneratedRecipeModal';
-import { generateRecipe } from './services/geminiService';
+import { generateRecipe } from './services/openaiService';
 import type { Recipe, SearchFilters } from './types';
 import { PREFERENCE_OPTIONS, DIFFICULTY_OPTIONS, DIET_OPTIONS } from './constants';
 import { useTranslation } from './i18n';

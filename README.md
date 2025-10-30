@@ -19,8 +19,8 @@ View your app in AI Studio: https://ai.studio/apps/drive/1kwfQAInsiHcXyIJrAcYSAZ
    ```
 2. Set the environment variable:
    - Copy `env.example` to `.env.local`
-   - Set `VITE_GEMINI_API_KEY` to your Gemini API key
-   - Get your API key from: https://aistudio.google.com/app/apikey
+   - Set `VITE_OPENAI_API_KEY` to your OpenAI API key
+   - Get your API key from: https://platform.openai.com/api-keys
 3. Run the app:
    ```bash
    npm run dev
