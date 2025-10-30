@@ -2,11 +2,15 @@ import { GoogleGenAI, Type } from "@google/genai";
 import type { Recipe, SearchFilters } from '../types';
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const BASE_URL = import.meta.env.VITE_GEMINI_BASE_URL;
 
 let ai: GoogleGenAI | null = null;
 
 if (API_KEY) {
-    ai = new GoogleGenAI({ apiKey: API_KEY });
+    ai = new GoogleGenAI({
+        apiKey: API_KEY,
+        ...(BASE_URL && { baseUrl: BASE_URL })
+    });
 }
 
 const getAI = () => {
