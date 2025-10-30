@@ -22,6 +22,13 @@ const App: React.FC = () => {
     }));
   };
 
+  const ERROR_MESSAGE_MAP: Record<string, Parameters<typeof t>[0]> = {
+    API_QUOTA_EXCEEDED: 'error.quotaExceeded',
+    API_INVALID_KEY: 'error.invalidKey',
+    API_UNKNOWN_ERROR: 'error.unknown',
+    'error.invalidRecipeFormat': 'error.invalidRecipeFormat',
+  };
+
   const handleGenerateClick = useCallback(async () => {
     if (!ingredients.trim()) {
       setError(t('error.noIngredients'));
@@ -35,7 +42,16 @@ const App: React.FC = () => {
       setGeneratedRecipe(recipe);
     } catch (err) {
       console.error(err);
-      setError(err instanceof Error ? err.message : t('error.unknown'));
+      if (err instanceof Error) {
+        const translationKey = ERROR_MESSAGE_MAP[err.message];
+        if (translationKey) {
+          setError(t(translationKey));
+          return;
+        }
+        setError(err.message);
+        return;
+      }
+      setError(t('error.unknown'));
     } finally {
       setIsLoading(false);
     }

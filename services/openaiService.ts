@@ -1,4 +1,4 @@
-import OpenAI from 'openai';
+import OpenAI, { APIError } from 'openai';
 import type { Recipe, SearchFilters } from '../types';
 
 const API_KEY = import.meta.env.VITE_OPENAI_API_KEY;
@@ -103,13 +103,24 @@ export const generateRecipe = async (ingredients: string, filters: SearchFilters
 
     } catch (error) {
         console.error("Error in generateRecipe service:", error);
+
+        if (error instanceof APIError) {
+            if (error.status === 429) {
+                throw new Error("API_QUOTA_EXCEEDED");
+            }
+            if (error.status === 401 || error.status === 403) {
+                throw new Error("API_INVALID_KEY");
+            }
+        }
+
         if (error instanceof Error) {
             if (error.message.includes("JSON")) {
-                throw new Error("The AI returned an invalid recipe format. Please try generating again.");
+                throw new Error("error.invalidRecipeFormat");
             }
             throw error;
         }
-        throw new Error("An unknown error occurred during recipe generation.");
+
+        throw new Error("API_UNKNOWN_ERROR");
     }
 };
 

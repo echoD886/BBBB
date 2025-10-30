@@ -78,6 +78,9 @@ const translations = {
     },
     error: {
         noIngredients: 'Please enter the ingredients you have.',
+        invalidRecipeFormat: 'The AI response was incomplete. Please try again.',
+        quotaExceeded: 'OpenAI quota is exceeded. Check billing or try later.',
+        invalidKey: 'OpenAI API key is invalid or missing. Update the key.',
         unknown: 'An unknown error occurred. Please try again later.'
     }
   },
@@ -160,6 +163,9 @@ const translations = {
     },
     error: {
         noIngredients: '请输入你拥有的食材。',
+        invalidRecipeFormat: 'AI 返回的数据不完整，请重试。',
+        quotaExceeded: 'OpenAI 配额已用完，请检查账单或稍后再试。',
+        invalidKey: 'OpenAI API Key 无效或缺失，请更新密钥。',
         unknown: '发生未知错误，请稍后再试。'
     }
   },
