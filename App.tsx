@@ -133,31 +133,99 @@ const App: React.FC = () => {
     setGeneratedRecipe(sampleRecipes[recipeKey]);
   }
 
-  // 随机食材数据库
+  // 随机食材数据库（扩展版）
   const randomIngredientsPool = language === 'zh'
     ? [
+        // 中式家常菜
         ['鸡蛋', '番茄', '葱'],
         ['土豆', '牛肉', '洋葱'],
-        ['三文鱼', '柠檬', '黄油'],
-        ['意大利面', '罗勒', '大蒜'],
-        ['鸡胸肉', '西兰花', '胡萝卜'],
-        ['虾仁', '蒜蓉', '粉丝'],
-        ['豆腐', '香菇', '青菜'],
         ['猪肉', '大白菜', '生姜'],
         ['茄子', '青椒', '蒜'],
-        ['米饭', '鸡蛋', '酱油']
+        ['米饭', '鸡蛋', '酱油'],
+        ['豆腐', '香菇', '青菜'],
+        ['排骨', '莲藕', '红枣'],
+        ['鸡腿', '土豆', '青椒'],
+        ['鲫鱼', '豆腐', '生姜'],
+        ['牛肉', '西红柿', '土豆'],
+
+        // 海鲜类
+        ['三文鱼', '柠檬', '黄油'],
+        ['虾仁', '蒜蓉', '粉丝'],
+        ['鱿鱼', '洋葱', '青椒'],
+        ['螃蟹', '生姜', '大葱'],
+        ['贝类', '粉丝', '蒜'],
+
+        // 西式料理
+        ['意大利面', '罗勒', '大蒜'],
+        ['鸡胸肉', '西兰花', '胡萝卜'],
+        ['培根', '奶油', '蘑菇'],
+        ['牛排', '迷迭香', '土豆'],
+        ['芝士', '番茄', '面包'],
+
+        // 日韩风味
+        ['豆腐', '味噌', '海带'],
+        ['泡菜', '猪肉', '豆腐'],
+        ['金枪鱼', '海苔', '米饭'],
+        ['年糕', '辣酱', '鱼饼'],
+
+        // 素食健康
+        ['南瓜', '藜麦', '坚果'],
+        ['菠菜', '豆腐', '芝麻'],
+        ['胡萝卜', '西芹', '苹果'],
+        ['紫薯', '牛奶', '蜂蜜'],
+        ['牛油果', '番茄', '柠檬'],
+
+        // 快手简餐
+        ['方便面', '鸡蛋', '青菜'],
+        ['火腿', '芝士', '面包'],
+        ['香肠', '洋葱', '土豆'],
+        ['午餐肉', '鸡蛋', '米饭']
       ]
     : [
+        // Chinese home cooking
         ['eggs', 'tomatoes', 'scallions'],
         ['potatoes', 'beef', 'onions'],
-        ['salmon', 'lemon', 'butter'],
-        ['pasta', 'basil', 'garlic'],
-        ['chicken breast', 'broccoli', 'carrots'],
-        ['shrimp', 'garlic', 'vermicelli'],
-        ['tofu', 'mushrooms', 'bok choy'],
         ['pork', 'cabbage', 'ginger'],
         ['eggplant', 'bell peppers', 'garlic'],
-        ['rice', 'eggs', 'soy sauce']
+        ['rice', 'eggs', 'soy sauce'],
+        ['tofu', 'mushrooms', 'bok choy'],
+        ['pork ribs', 'lotus root', 'red dates'],
+        ['chicken legs', 'potatoes', 'bell peppers'],
+        ['crucian carp', 'tofu', 'ginger'],
+        ['beef', 'tomatoes', 'potatoes'],
+
+        // Seafood
+        ['salmon', 'lemon', 'butter'],
+        ['shrimp', 'garlic', 'vermicelli'],
+        ['squid', 'onions', 'bell peppers'],
+        ['crab', 'ginger', 'scallions'],
+        ['clams', 'vermicelli', 'garlic'],
+
+        // Western cuisine
+        ['pasta', 'basil', 'garlic'],
+        ['chicken breast', 'broccoli', 'carrots'],
+        ['bacon', 'cream', 'mushrooms'],
+        ['steak', 'rosemary', 'potatoes'],
+        ['cheese', 'tomatoes', 'bread'],
+
+        // Japanese and Korean
+        ['tofu', 'miso', 'seaweed'],
+        ['kimchi', 'pork', 'tofu'],
+        ['tuna', 'nori', 'rice'],
+        ['rice cakes', 'gochujang', 'fish cakes'],
+
+        // Healthy vegetarian
+        ['pumpkin', 'quinoa', 'nuts'],
+        ['spinach', 'tofu', 'sesame'],
+        ['carrots', 'celery', 'apples'],
+        ['purple sweet potato', 'milk', 'honey'],
+        ['avocado', 'tomatoes', 'lemon'],
+
+        // Quick meals
+        ['instant noodles', 'eggs', 'vegetables'],
+        ['ham', 'cheese', 'bread'],
+        ['sausages', 'onions', 'potatoes'],
+        ['spam', 'eggs', 'rice']
       ];
 
   // 随机生成食材并触发生成
