@@ -31,8 +31,11 @@ const App: React.FC = () => {
     'error.invalidRecipeFormat': 'error.invalidRecipeFormat',
   };
 
-  const handleGenerateClick = useCallback(async () => {
-    if (!ingredients.trim()) {
+  const handleGenerateClick = useCallback(async (customIngredients?: string) => {
+    // 使用传入的食材或当前state中的食材
+    const ingredientsToUse = customIngredients || ingredients;
+
+    if (!ingredientsToUse.trim()) {
       setError(t('error.noIngredients'));
       return;
     }
@@ -40,8 +43,8 @@ const App: React.FC = () => {
     setError(null);
     setGeneratedRecipe(null);
     try {
-      // 直接使用 Gemini API
-      const recipe = await generateRecipeWithGemini(ingredients, filters, language);
+      // 直接使用 Gemini API，传入要使用的食材
+      const recipe = await generateRecipeWithGemini(ingredientsToUse, filters, language);
       setGeneratedRecipe(recipe);
     } catch (err) {
       console.error(err);
@@ -234,13 +237,13 @@ const App: React.FC = () => {
     const randomIndex = Math.floor(Math.random() * randomIngredientsPool.length);
     const randomIngredients = randomIngredientsPool[randomIndex].join(', ');
 
-    // 设置食材
+    // 设置食材到输入框
     setIngredients(randomIngredients);
 
-    // 延迟一下，让用户看到食材已填充
+    // 延迟一下，让用户看到食材已填充，然后直接用这些食材生成
     setTimeout(() => {
-      // 自动触发生成
-      handleGenerateClick();
+      // 直接传入随机食材，避免 state 更新延迟问题
+      handleGenerateClick(randomIngredients);
     }, 300);
   }
 
